@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS 作文填空练习</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- 左侧边栏 - 历史记录 -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>历史记录</span>
+                <button id="clear-history-btn" class="clear-btn" title="清空历史">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="history-list" class="history-list">
+                <div class="history-empty">暂无历史记录</div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <div class="container">
+                <header>
+                    <h1>IELTS Writing Practice</h1>
+                    <p class="subtitle">AI智能挖空 · 高效背诵</p>
+                </header>
+
+                <!-- API 配置区域 -->
+                <section id="api-config-section" class="section">
+                    <div class="section-header">
+                        <span class="step-badge">⚙</span>
+                        <h2>API 配置</h2>
+                        <button id="toggle-config-btn" class="icon-btn" title="展开/收起">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="api-config-content" class="config-content">
+                        <div class="config-row">
+                            <div class="config-field">
+                                <label for="api-endpoint">API 端点</label>
+                                <input type="text" id="api-endpoint" value="https://yunwu.ai/v1/chat/completions" placeholder="https://yunwu.ai/v1/chat/completions">
+                            </div>
+                            <div class="config-field">
+                                <label for="api-model">模型 ID</label>
+                                <input type="text" id="api-model" placeholder="gpt-4o-mini / claude-3-haiku 等">
+                            </div>
+                        </div>
+                        <div class="config-row">
+                            <div class="config-field full-width">
+                                <label for="api-key">API Key</label>
+                                <div class="password-input">
+                                    <input type="password" id="api-key" placeholder="sk-xxxxx">
+                                    <button type="button" id="toggle-key-btn" class="icon-btn-small">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                            <circle cx="12" cy="12" r="3"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="config-actions">
+                            <button id="test-api-btn" class="small-btn test-btn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                                测试连接
+                            </button>
+                            <button id="save-config-btn" class="small-btn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                    <polyline points="17 21 17 13 7 13 7 21"/>
+                                    <polyline points="7 3 7 8 15 8"/>
+                                </svg>
+                                保存配置
+                            </button>
+                            <span id="config-status" class="config-status"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 输入区域 -->
+                <section id="input-section" class="section">
+                    <div class="section-header">
+                        <span class="step-badge">1</span>
+                        <h2>粘贴你的范文</h2>
+                    </div>
+                    <textarea id="essay-input" placeholder="在此粘贴你要练习的雅思范文...
+
+例如：
+In contemporary society, the issue of environmental protection has become increasingly prominent. Some people argue that governments should take primary responsibility for addressing this problem, while others believe that individuals should bear more responsibility.
+
+From my perspective, both governments and individuals have crucial roles to play in environmental protection..."></textarea>
+                    
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="blank-ratio">挖空比例</label>
+                            <div class="slider-container">
+                                <input type="range" id="blank-ratio" min="10" max="80" value="30">
+                                <span id="ratio-display">30%</span>
+                            </div>
+                        </div>
+                        
+                        <button id="generate-btn" class="primary-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                            AI 智能挖空
+                        </button>
+                    </div>
+                    
+                    <div id="loading-indicator" class="loading hidden">
+                        <div class="spinner"></div>
+                        <span>AI 正在分析文章并智能挖空...</span>
+                    </div>
+                </section>
+
+                <!-- 练习区域 -->
+                <section id="practice-section" class="section hidden">
+                    <div class="section-header">
+                        <span class="step-badge">2</span>
+                        <h2>填空练习</h2>
+                        <div class="stats">
+                            <span id="progress-text">0 / 0</span>
+                            <span id="accuracy-text"></span>
+                        </div>
+                    </div>
+                    
+                    <div id="essay-display" class="essay-container"></div>
+                    
+                    <div class="action-bar">
+                        <button id="check-btn" class="secondary-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            检查答案
+                        </button>
+                        <button id="show-answers-btn" class="ghost-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            显示答案
+                        </button>
+                        <button id="reset-btn" class="ghost-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                                <path d="M3 3v5h5"/>
+                            </svg>
+                            重新挖空
+                        </button>
+                        <button id="new-essay-btn" class="ghost-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="12" y1="18" x2="12" y2="12"/>
+                                <line x1="9" y1="15" x2="15" y2="15"/>
+                            </svg>
+                            换篇练习
+                        </button>
+                    </div>
+                </section>
+
+                <!-- 结果统计 -->
+                <section id="result-section" class="section hidden">
+                    <div class="result-card">
+                        <div class="result-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        </div>
+                        <h3>练习完成！</h3>
+                        <div class="result-stats">
+                            <div class="stat-item">
+                                <span class="stat-value" id="correct-count">0</span>
+                                <span class="stat-label">正确</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="wrong-count">0</span>
+                                <span class="stat-label">错误</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="accuracy-rate">0%</span>
+                                <span class="stat-label">正确率</span>
+                            </div>
+                        </div>
+                        <div class="wrong-words" id="wrong-words-section">
+                            <h4>需要复习的词汇：</h4>
+                            <div id="wrong-words-list"></div>
+                        </div>
+                        <div class="result-actions">
+                            <button id="retry-btn" class="primary-btn" onclick="retryPractice()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 4v6h6"/>
+                                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                                </svg>
+                                重新复习
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
