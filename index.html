@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>作文挖空打字练习</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --accent: #4b8bec;
+      --bg: #0f172a;
+      --panel: #111827;
+      --border: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      font-family: "Inter", "SF Pro Display", system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: radial-gradient(circle at 10% 20%, #13213c, #0b1022), var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    .page {
+      width: min(1100px, 100%);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      letter-spacing: 0.5px;
+    }
+
+    p.description {
+      margin: 0 0 20px;
+      color: var(--muted);
+    }
+
+    .card {
+      background: rgba(17, 24, 39, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    textarea,
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--text);
+      font-size: 15px;
+      resize: vertical;
+    }
+
+    textarea {
+      min-height: 180px;
+    }
+
+    .inline-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: linear-gradient(135deg, var(--accent), #7f57ff);
+      border: none;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 30px rgba(75, 139, 236, 0.3);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 36px rgba(75, 139, 236, 0.45);
+    }
+
+    button.secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .exercise {
+      margin-top: 18px;
+      padding: 18px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .blank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 60px;
+      padding: 4px 6px;
+      margin: 2px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .blank input {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      text-align: center;
+      outline: none;
+      font-size: 15px;
+      width: 100%;
+    }
+
+    .blank.correct {
+      border-color: #22c55e;
+      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15);
+    }
+
+    .blank.wrong {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15);
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--muted);
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .pill {
+      padding: 4px 10px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .answers {
+      margin-top: 14px;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .answer-item {
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+    }
+
+    @media (min-width: 840px) {
+      .controls {
+        grid-template-columns: 2fr 1fr;
+      }
+
+      textarea {
+        min-height: 260px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>作文挖空打字练习</h1>
+    <p class="description">
+      将完整范文粘贴进来，设置空格数量后生成挖空练习。按下「核对答案」即可批改，每个空会提示正确或错误，并可展开答案提示。
+    </p>
+
+    <div class="card">
+      <div class="controls">
+        <div>
+          <label for="essay-input">范文</label>
+          <textarea id="essay-input" placeholder="在此粘贴雅思作文范文……"></textarea>
+        </div>
+        <div>
+          <label for="blank-count">挖空数量</label>
+          <input id="blank-count" type="number" min="1" max="200" value="15" />
+          <p style="color: var(--muted); font-size: 14px; margin: 6px 0 0;">
+            系统优先选择长度合适的实词挖空，自动跳过标点和超短词。
+          </p>
+        </div>
+      </div>
+
+      <div class="inline-controls" style="margin-top: 12px;">
+        <button id="generate-btn">生成练习</button>
+        <button class="secondary" id="reset-btn">清空文本</button>
+        <span class="pill" id="blank-info">尚未生成练习</span>
+      </div>
+    </div>
+
+    <div id="exercise" class="exercise" aria-live="polite"></div>
+
+    <div class="inline-controls" style="margin-top: 10px;">
+      <button class="secondary" id="check-btn">核对答案</button>
+      <button class="secondary" id="reveal-btn">显示答案</button>
+      <button class="secondary" id="hide-btn">隐藏答案</button>
+    </div>
+
+    <div class="legend">
+      <span class="pill">绿色：正确</span>
+      <span class="pill">红色：需要修改</span>
+    </div>
+
+    <div class="answers" id="answers"></div>
+  </div>
+
+  <script>
+    const essayInput = document.getElementById("essay-input");
+    const blankCountInput = document.getElementById("blank-count");
+    const exerciseBox = document.getElementById("exercise");
+    const blankInfo = document.getElementById("blank-info");
+    const answersBox = document.getElementById("answers");
+
+    const generateBtn = document.getElementById("generate-btn");
+    const resetBtn = document.getElementById("reset-btn");
+    const checkBtn = document.getElementById("check-btn");
+    const revealBtn = document.getElementById("reveal-btn");
+    const hideBtn = document.getElementById("hide-btn");
+
+    function tokenize(text) {
+      // Preserve punctuation as separate tokens
+      return text.match(/[A-Za-z]+(?:'[A-Za-z]+)?|[\u4e00-\u9fa5]+|[0-9]+|[^\s]/g) || [];
+    }
+
+    function pickBlankPositions(tokens, desiredCount) {
+      const candidates = [];
+      tokens.forEach((token, index) => {
+        const isWord = /^[A-Za-z\u4e00-\u9fa5]+$/.test(token);
+        const longEnough = token.length >= 3;
+        const notAllShort = !/^(a|an|the|and|or|but|in|on|at|to|of|for)$/i.test(token);
+        if (isWord && longEnough && notAllShort) {
+          candidates.push({ token, index });
+        }
+      });
+
+      const count = Math.min(desiredCount, candidates.length);
+      const selected = [];
+      const used = new Set();
+      while (selected.length < count && candidates.length) {
+        const choice = candidates.splice(Math.floor(Math.random() * candidates.length), 1)[0];
+        if (!used.has(choice.index)) {
+          used.add(choice.index);
+          selected.push(choice.index);
+        }
+      }
+      return new Set(selected);
+    }
+
+    function buildExercise(text, blankCount) {
+      exerciseBox.innerHTML = "";
+      answersBox.innerHTML = "";
+
+      const tokens = tokenize(text);
+      const blankPositions = pickBlankPositions(tokens, blankCount);
+      let blanksPlaced = 0;
+
+      tokens.forEach((token, idx) => {
+        if (blankPositions.has(idx)) {
+          blanksPlaced += 1;
+          const wrapper = document.createElement("span");
+          wrapper.className = "blank";
+          wrapper.dataset.answer = token;
+          wrapper.title = `答案: ${token}`;
+
+          const input = document.createElement("input");
+          input.type = "text";
+          input.setAttribute("aria-label", `空格 ${blanksPlaced}`);
+          input.dataset.index = blanksPlaced;
+
+          wrapper.appendChild(input);
+          exerciseBox.appendChild(wrapper);
+
+          const answerItem = document.createElement("span");
+          answerItem.className = "answer-item";
+          answerItem.textContent = `${blanksPlaced}. ${token}`;
+          answersBox.appendChild(answerItem);
+        } else {
+          exerciseBox.appendChild(document.createTextNode(token));
+        }
+      });
+
+      blankInfo.textContent = blanksPlaced
+        ? `已生成 ${blanksPlaced} 个空`
+        : "无法挖空，请提供更多可用的词语";
+    }
+
+    function checkAnswers() {
+      const inputs = exerciseBox.querySelectorAll(".blank input");
+      inputs.forEach((input) => {
+        const expected = input.parentElement.dataset.answer;
+        const value = input.value.trim();
+        const correct = value.localeCompare(expected, undefined, {
+          sensitivity: "accent",
+          usage: "search",
+        }) === 0;
+        input.parentElement.classList.toggle("correct", correct);
+        input.parentElement.classList.toggle("wrong", value && !correct);
+      });
+    }
+
+    function revealAnswers(show) {
+      const inputs = exerciseBox.querySelectorAll(".blank input");
+      inputs.forEach((input) => {
+        if (show) {
+          input.value = input.parentElement.dataset.answer;
+        } else {
+          input.value = "";
+          input.parentElement.classList.remove("correct", "wrong");
+        }
+      });
+    }
+
+    generateBtn.addEventListener("click", () => {
+      const text = essayInput.value.trim();
+      const blanks = parseInt(blankCountInput.value, 10);
+      if (!text) {
+        blankInfo.textContent = "请先粘贴范文";
+        exerciseBox.textContent = "";
+        answersBox.innerHTML = "";
+        return;
+      }
+      buildExercise(text, isNaN(blanks) ? 0 : blanks);
+      exerciseBox.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+
+    resetBtn.addEventListener("click", () => {
+      essayInput.value = "";
+      exerciseBox.innerHTML = "";
+      answersBox.innerHTML = "";
+      blankInfo.textContent = "尚未生成练习";
+    });
+
+    checkBtn.addEventListener("click", checkAnswers);
+    revealBtn.addEventListener("click", () => revealAnswers(true));
+    hideBtn.addEventListener("click", () => revealAnswers(false));
+  </script>
+</body>
+</html>
