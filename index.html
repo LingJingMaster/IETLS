@@ -116,7 +116,6 @@
       border-radius: 12px;
       white-space: pre-wrap;
       word-break: break-word;
-      line-height: 1.8;
     }
 
     .blank {
@@ -230,7 +229,6 @@
       <button class="secondary" id="check-btn">核对答案</button>
       <button class="secondary" id="reveal-btn">显示答案</button>
       <button class="secondary" id="hide-btn">隐藏答案</button>
-      <span class="pill" id="answers-toggle-state">答案已隐藏</span>
     </div>
 
     <div class="legend">
@@ -238,7 +236,7 @@
       <span class="pill">红色：需要修改</span>
     </div>
 
-    <div class="answers" id="answers" style="display: none;"></div>
+    <div class="answers" id="answers"></div>
   </div>
 
   <script>
@@ -247,7 +245,6 @@
     const exerciseBox = document.getElementById("exercise");
     const blankInfo = document.getElementById("blank-info");
     const answersBox = document.getElementById("answers");
-    const answersToggleState = document.getElementById("answers-toggle-state");
 
     const generateBtn = document.getElementById("generate-btn");
     const resetBtn = document.getElementById("reset-btn");
@@ -255,14 +252,9 @@
     const revealBtn = document.getElementById("reveal-btn");
     const hideBtn = document.getElementById("hide-btn");
 
-    let answersVisible = false;
-
     function tokenize(text) {
-      return (
-        text.match(
-          /[A-Za-z]+(?:'[A-Za-z]+)?|[\u4e00-\u9fa5]+|[0-9]+|\\s+|[^\\s]/g
-        ) || []
-      );
+      // Preserve punctuation as separate tokens
+      return text.match(/[A-Za-z]+(?:'[A-Za-z]+)?|[\u4e00-\u9fa5]+|[0-9]+|[^\s]/g) || [];
     }
 
     function pickBlankPositions(tokens, desiredCount) {
@@ -292,9 +284,6 @@
     function buildExercise(text, blankCount) {
       exerciseBox.innerHTML = "";
       answersBox.innerHTML = "";
-      answersVisible = false;
-      answersBox.style.display = "none";
-      answersToggleState.textContent = "答案已隐藏";
 
       const tokens = tokenize(text);
       const blankPositions = pickBlankPositions(tokens, blankCount);
@@ -354,9 +343,6 @@
           input.parentElement.classList.remove("correct", "wrong");
         }
       });
-      answersVisible = show;
-      answersBox.style.display = show ? "flex" : "none";
-      answersToggleState.textContent = show ? "答案已显示" : "答案已隐藏";
     }
 
     generateBtn.addEventListener("click", () => {
